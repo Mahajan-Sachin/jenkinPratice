@@ -1,15 +1,43 @@
-pipeline{
+pipeline {
     agent any
-    stages{
-        stage('build'){
+    triggers{
+        pollSCM('* * * * *')
+    }
+    stages {
+
+        stage('Build Maven'){
             steps{
                 bat 'mvn clean package'
             }
         }
-    }
-    post{
-        success{
-            archiveArtifacts artifacts: 'target/*.jar'
+
+        stage('Build Docker Image'){
+            steps{
+                bat 'docker build -t mycalculator .'
+            }
+        }
+
+        stage('Show Images'){
+            steps{
+                bat 'docker images'
+            }
+        }
+        stage('run docker image'){
+            steps{
+                bat 'docker run -d --name mycalculator mycalculator'
+            }
+        }
+        post{
+            success{
+                archiveArtifacts artifacts: 'target/*.jar'
+                echo 'Build and Docker Image creation successful!'
+            }
+            failure{
+                echo 'Build or Docker Image creation failed.'
+            }
+            always{
+                echo 'Pipeline execution completed.'
+            }
         }
     }
 }
