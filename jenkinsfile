@@ -27,7 +27,8 @@ pipeline {
                 bat 'docker run -d --name mycalculator mycalculator'
             }
         }
-        post{
+    }
+    post{
             success{
                 archiveArtifacts artifacts: 'target/*.jar'
                 echo 'Build and Docker Image creation successful!'
@@ -39,5 +40,4 @@ pipeline {
                 echo 'Pipeline execution completed.'
             }
         }
-    }
 }
